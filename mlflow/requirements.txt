@@ -1,0 +1,4 @@
+psycopg2==2.9.10
+protobuf==5.29.3
+mlflow==2.20.0rc0
+boto3==1.36.2

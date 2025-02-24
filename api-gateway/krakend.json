@@ -1,0 +1,54 @@
+{
+    "version": 3,
+    "extra_config": {
+        "telemetry/opentelemetry": {
+            "service_name": "krakend_prometheus_service",
+            "metric_reporting_period": 1,
+            "exporters": {
+            "prometheus": [
+                {
+                "name": "local_prometheus",
+                "port": 9091,
+                "process_metrics": true,
+                "go_metrics": true
+                }
+            ]
+            }
+        }
+    },
+    "endpoints": [
+        {
+            "endpoint": "hello",
+            "timeout": "50s",
+            "method": "POST",
+            "output_encoding": "no-op",
+            "input_headers": [
+                ""
+            ],
+            "headers_to_pass": [
+                "Authorization",
+                "Content-Type",
+                "X-Custom-Header"
+            ],
+            "backend": [
+                {
+                    "host": [
+                        "http://api:8000"
+                    ],
+                    "extra_config": {
+                    "github.com/devopsfaith/krakend/http": {
+                        "headers_to_pass": [
+                        "Authorization",
+                        "Content-Type",
+                        "X-Custom-Header"
+                        ]
+                    }
+                    },
+                    "method": "POST",
+                    "url_pattern": "/predict"
+                }
+            ]
+        }
+    ]
+}
+  

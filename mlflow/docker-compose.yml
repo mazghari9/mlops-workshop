@@ -1,0 +1,45 @@
+version: "3.8"
+
+services:
+  mlflow:
+    build: .
+    restart: always
+    volumes:
+      - ./wait-for-it.sh:/wait-for-it.sh
+      - ./basic_auth.ini:/usr/local/lib/python3.11/site-packages/mlflow/server/auth/basic_auth.ini
+    env_file:
+      - .env
+    entrypoint: bash ./wait-for-it.sh postgres:5432 -t 90 -- mlflow server --app-name basic-auth --backend-store-uri postgresql://mlflow_user:mlflow_user@postgres:5432/mlflow_db --default-artifact-root s3://mlflow/ --host 0.0.0.0 --port 5000
+    ports:
+      - "5000:5000"
+    depends_on:
+      - postgres
+    networks:
+      - lab
+
+  postgres:
+    image: postgres:17.2
+
+    restart: always
+    env_file:
+      - .env
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - lab
+
+  postgres_auth:
+    image: postgres:17.2
+
+    restart: always
+    env_file:
+      - ./auth_db.env
+    volumes:
+      - postgres-auth-data:/var/lib/postgresql/data
+    networks:
+      - lab
+volumes:
+  postgres-data:
+  postgres-auth-data:
+networks:
+  lab:
